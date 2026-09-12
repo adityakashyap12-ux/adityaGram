@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Signup • Aditya</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+body { margin:0; height:100vh; display:flex; justify-content:center; align-items:center; background: linear-gradient(45deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888); font-family: 'Segoe UI', sans-serif; }
+.box { background: rgba(255,255,255,0.95); padding:40px 35px; border-radius:20px; width:320px; text-align:center; box-shadow: 0 20px 40px rgba(0,0,0,0.3); }
+h2 { margin:0 0 5px 0; font-size:28px; }
+.sub { color: #8e8e8e; font-size:14px; margin-bottom:15px; line-height:18px; }
+input { width:100%; padding:14px; margin:8px 0; border-radius:10px; border:1px solid #dbdbdb; background:#fafafa; box-sizing:border-box; outline:none; }
+input:focus { border-color:#a8a8a8; background:white; }
+button { width:100%; padding:14px; background: linear-gradient(45deg, #405de6, #5851db); border:none; border-radius:10px; color:white; font-weight:bold; font-size:15px; cursor:pointer; margin-top:15px; }
+button:hover { opacity:0.9; transform: scale(1.02); transition:0.2s; }
+#msg { margin-top:15px; font-weight:600; min-height:20px; }
+a { color:#00376b; text-decoration:none; font-size:14px; margin-top:20px; display:block; font-weight:600; }
+a b { color:#0095f6; }
+</style>
+</head>
+<body>
+<div class="box">
+<h2>AdityaGram</h2>
+<p class="sub">Sign up to see photos and videos from your friends.</p>
+<input id="email" type="email" placeholder="Mobile Number or Email">
+<input id="pass" type="password" placeholder="Password">
+<button onclick="signup()">Sign Up</button>
+<p id="msg"></p>
+<a href="login.html">Have an account? <b>Log in</b></a>
+</div>
+<script>
+async function signup(){
+  const email = document.getElementById('email').value;
+  const password = document.getElementById('pass').value;
+  const res = await fetch('/signup', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({email,password}) });
+  const data = await res.json();
+  document.getElementById('msg').innerText = data.message;
+  document.getElementById('msg').style.color = data.success ? "green" : "red";
+  if(data.success){ setTimeout(()=>{ window.location.href="login.html"; }, 30000); }
+}
+</script>
+</body>
+</html>
