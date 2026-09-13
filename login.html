@@ -1,22 +1,22 @@
 <!DOCTYPE html>
 <html>
 <head>
-  
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="google-site-verification" content="xJhI5mnTduXnmKWiRavHrGgxbKyxNgW00Vj8lHHFct8" />
-  
-  <title>AdityaGram – Share Moments, Connect Friends</title>
-  <meta name="description" content="AdityaGram is a social platform made by Aditya from Sahaswan. Share photos, like posts, chat with friends and explore. Join now!">
-  <meta name="keywords" content="AdityaGram, Aditya Gram, social media, Sahaswan, Instagram clone">
-  <meta name="author" content="Aditya">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="google-site-verification" content="xJhI5mnTduXnmKwiRavHrGgxbKyxNgW00Vj81HMFct8">
 
-  <!-- For Google Beautiful Preview -->
-  <meta property="og:title" content="AdityaGram – Share Moments, Connect Friends">
-  <meta property="og:description" content="Join AdityaGram - A new social platform to share your life with friends.">
-  <meta property="og:image" content="https://aditya-gram.vercel.app/logo.png">
-  <meta property="og:url" content="https://aditya-gram.vercel.app">
+<title>AdityaGram - Share Moments, Connect Friends</title>
+<meta name="description" content="AdityaGram is a social platform made by Aditya from Sahaswan. Login to see photos from your friends.">
+<meta name="keywords" content="AdityaGram, Aditya Gram, social media, Sahaswan, Instagram clone">
+<meta name="author" content="Aditya Kashyap">
+
+<!-- For Google / LinkedIn / WhatsApp Beautiful Preview -->
+<meta property="og:title" content="AdityaGram - Share Moments, Connect Friends">
+<meta property="og:description" content="Join AdityaGram - A new social platform to share your life moments. Built by Aditya from Sahaswan.">
+<meta property="og:image" content="https://aditya-gram.vercel.app/preview.jpg">
+<meta property="og:url" content="https://aditya-gram.vercel.app">
+<meta property="og:type" content="website">
+<meta name="twitter:card" content="summary_large_image">
 <style>
 body { margin:0; height:100vh; display:flex; justify-content:center; align-items:center; background: linear-gradient(45deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888); font-family: 'Segoe UI', sans-serif; }
 .box { background: rgba(255,255,255,0.95); padding:40px 35px; border-radius:20px; width:320px; text-align:center; box-shadow: 0 20px 40px rgba(0,0,0,0.3); }
@@ -45,10 +45,24 @@ a b { color:#0095f6; }
 async function login(){
   const email = document.getElementById('email').value;
   const password = document.getElementById('pass').value;
-  const res = await fetch('/login', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({email,password}) });
+  const msg = document.getElementById('msg');
+
+  const res = await fetch('https://adityagram-backend-aditya12-2026.onrender.com/login', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ email, password })
+  });
+
   const data = await res.json();
-  document.getElementById('msg').innerText = data.message;
-  document.getElementById('msg').style.color = data.success ? "green" : "red";
+  msg.innerText = data.message;
+
+  if(data.success){
+    msg.style.color = "green";
+    // Redirect to home page of AdityaGram
+    window.location.href = "AdityaGram/index.html"; 
+  } else {
+    msg.style.color = "red";
+  }
 }
 </script>
 </body>

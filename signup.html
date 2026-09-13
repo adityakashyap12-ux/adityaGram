@@ -31,11 +31,31 @@ a b { color:#0095f6; }
 async function signup(){
   const email = document.getElementById('email').value;
   const password = document.getElementById('pass').value;
-  const res = await fetch('/signup', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({email,password}) });
+  const msg = document.getElementById('msg');
+
+  if(!email || !password){
+    msg.innerText = "Please fill all fields";
+    return;
+  }
+
+  // Call backend route
+  const res = await fetch('https://adityagram-backend-aditya12-2026.onrender.com/signup', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ email, password })
+  });
+
   const data = await res.json();
-  document.getElementById('msg').innerText = data.message;
-  document.getElementById('msg').style.color = data.success ? "green" : "red";
-  if(data.success){ setTimeout(()=>{ window.location.href="login.html"; }, 30000); }
+  msg.innerText = data.message;
+
+  if(data.success){
+    msg.style.color = "green";
+    setTimeout(() => {
+      window.location.href = "login.html";
+    }, 1000);
+  } else {
+    msg.style.color = "red";
+  }
 }
 </script>
 </body>
