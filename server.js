@@ -13,6 +13,14 @@ app.get('/', (req,res) => {
   res.sendFile(path.join(__dirname, "login.html"));
 });
 
+app.get('/signup.html', (req,res) => {
+  res.sendFile(path.join(__dirname, "signup.html"));
+});
+
+app.get('/index.html', (req,res) => {
+  res.sendFile(path.join(__dirname, "index.html"));
+});
+
 app.post('/signup', (req,res) => {
   const { email, password } = req.body;
   if(users.find(u => u.email == email)){
