@@ -26,7 +26,6 @@
   </div>
 
   <div id="feed"></div>
-
 <script>
   async function loadPosts() {
     const res = await fetch('/api/posts');
@@ -37,25 +36,33 @@
         <div class="post-info">
           <b>${p.username}</b> - ${p.caption}
           <br>
-          <button onclick="likePost('${p._id}')">❤️ ${p.likes} Likes</button>
+          <button onclick="likePost('${p._id}')">❤️ ${p.likes || 0} Likes</button>
         </div>
       </div>
     `).join('');
   }
 
   async function uploadPost() {
-    const caption = document.getElementById('caption').value;
-    const image = document.getElementById('image').files[0];
+    const captionInput = document.getElementById('caption');
+    const imageInput = document.getElementById('image');
+    const caption = captionInput.value;
+    const image = imageInput.files[0];
     if (!image) return alert('Photo select karo');
 
     const formData = new FormData();
     formData.append('caption', caption);
     formData.append('image', image);
-    formData.append('username', 'aditya');
+    formData.append('username', localStorage.getItem('username') || 'aditya');
 
-    await fetch('/api/posts', { method: 'POST', body: formData });
-    alert('Post ho gaya!');
-    loadPosts();
+    const res = await fetch('/api/posts', { method: 'POST', body: formData });
+    if(res.ok) {
+      captionInput.value = '';
+      imageInput.value = '';
+      alert('Post ho gaya! 🔥');
+      loadPosts();
+    } else {
+      alert('Post fail ho gaya');
+    }
   }
 
   async function likePost(id) {
@@ -65,5 +72,6 @@
 
   loadPosts();
 </script>
+
 </body>
 </html>
