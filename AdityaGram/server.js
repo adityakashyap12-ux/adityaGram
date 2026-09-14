@@ -18,8 +18,8 @@ app.get('/AdityaGram/index.html', (req,res) => {
   res.sendFile(path.join(__dirname, "AdityaGram", "index.html"));
 });
 
-app.get('/AdityaGram/signup.html', (req,res) => {
-  res.sendFile(path.join(__dirname, "AdityaGram", "signup.html"));
+app.get('/AdityaGram/login.html', (req,res) => {
+  res.sendFile(path.join(__dirname, "AdityaGram", "login.html"));
 });
 
 const PORT = process.env.PORT || 3000;
