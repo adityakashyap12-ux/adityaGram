@@ -15,13 +15,19 @@ app.use(express.static(path.join(__dirname, 'AdityaGram')));
 app.use(express.static(__dirname));
 
 // Database Connect
-const MONGO_URI = process.env.MONGO_URI;
+const MONGO_URI = process.env.MONGO_URI || process.env.MONGODB_URI;
 if (MONGO_URI) {
   mongoose.connect(MONGO_URI)
-  // Vercel Blob Upload - isse photo delete nahi hogi
-const upload = multer();
+    .then(() => console.log('✅ MongoDB Connected'))
+    .catch(err => console.log('❌ DB Error:', err));
+} else {
+  console.log('MONGO_URI not found');
+}
 
-app.post('/api/upload', upload.single('file'), async (req, res) => {
+// Vercel Blob Upload - isse photo delete nahi hogi
+const upload = multer(); // memory storage
+
+app.post('/upload', upload.single('photo'), async (req, res) => {
   try {
     const blob = await put(req.file.originalname, req.file.buffer, {
       access: 'public',
@@ -31,11 +37,6 @@ app.post('/api/upload', upload.single('file'), async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 });
-    .then(() => console.log('✅ MongoDB Connected'))
-    .catch(err => console.log('❌ DB Error:', err));
-} else {
-  console.log('MONGO_URI not found in .env');
-}
 
 // Routes for pages
 app.get('/login.html', (req, res) => {
@@ -48,11 +49,7 @@ app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, 'AdityaGram', 'index.html'));
 });
 
-// Example API - signup data save karna
-// app.post('/api/signup', async (req, res) => { ... tera wala code yahan ayega ... })
-
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => console.log('Server running on', PORT));
 
-// Vercel ke liye export
 module.exports = app;
