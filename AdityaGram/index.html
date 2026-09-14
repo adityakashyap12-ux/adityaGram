@@ -1,12 +1,66 @@
 <!DOCTYPE html>
 <html>
-<head><title>AdityaGram Feed</title></head>
-<body style="font-family:sans-serif; text-align:center; padding-top:100px;">
-<h1 style="background: linear-gradient(45deg, #feda75, #fa7e1e, #d62976, #962fbf, #4f5bd5); -webkit-background-clip:text; color:transparent; font-size:50px;">AdityaGram</h1>
-<h2>Welcome! Login Successful 🎉</h2>
-<p>Your feed will come here.</p>
-<button onclick="window.location.href='/AdityaGram/login.html'" style="padding:10px 20px; margin-top:20px;">logout</button>
-<button onclick="window.location.href='/AdityaGram/signup.html'" style="padding:10px 20px; margin-top:20px;">signup</button>
-<button onclick="window.location.href='/AdityaGram/login.html'" style="padding:10px 20px; margin-top:20px;">login</button>
+<head>
+  <title>AdityaGram</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style>
+    body { font-family: Arial; background: #fafafa; max-width: 500px; margin: auto; padding: 10px; }
+  .post-box { background: white; border: 1px solid #ddd; padding: 15px; border-radius: 10px; margin-bottom: 20px; }
+  .post-box input,.post-box button { width: 100%; padding: 10px; margin-top: 10px; }
+  .post { background: white; border: 1px solid #ddd; border-radius: 10px; margin-bottom: 20px; overflow: hidden; }
+  .post img { width: 100%; }
+  .post-info { padding: 10px; }
+  </style>
+</head>
+<body>
+  <h2>AdityaGram 📸</h2>
+
+  <div class="post-box">
+    <h3>Naya Post</h3>
+    <input type="text" id="caption" placeholder="Caption likho...">
+    <input type="file" id="image">
+    <button onclick="uploadPost()">Post Karo</button>
+  </div>
+
+  <div id="feed"></div>
+
+<script>
+  async function loadPosts() {
+    const res = await fetch('/api/posts');
+    const posts = await res.json();
+    document.getElementById('feed').innerHTML = posts.map(p => `
+      <div class="post">
+        <img src="${p.imageUrl}">
+        <div class="post-info">
+          <b>${p.username}</b> - ${p.caption}
+          <br>
+          <button onclick="likePost('${p._id}')">❤️ ${p.likes} Likes</button>
+        </div>
+      </div>
+    `).join('');
+  }
+
+  async function uploadPost() {
+    const caption = document.getElementById('caption').value;
+    const image = document.getElementById('image').files[0];
+    if (!image) return alert('Photo select karo');
+
+    const formData = new FormData();
+    formData.append('caption', caption);
+    formData.append('image', image);
+    formData.append('username', 'aditya');
+
+    await fetch('/api/posts', { method: 'POST', body: formData });
+    alert('Post ho gaya!');
+    loadPosts();
+  }
+
+  async function likePost(id) {
+    await fetch('/api/posts/' + id + '/like', { method: 'POST' });
+    loadPosts();
+  }
+
+  loadPosts();
+</script>
 </body>
 </html>
