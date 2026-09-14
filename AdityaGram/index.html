@@ -5,41 +5,63 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <style>
   body { font-family: 'Segoe UI', Arial; background: linear-gradient(135deg, #feda75, #fa7e1e, #d62976, #962fbf, #4f5bd5); margin:0; min-height:100vh; }
-  h2 { text-align:center; color:white; padding:20px; text-shadow: 0 2px 10px rgba(0,0,0,0.3); font-size:28px; }
-  .post-box { background: white; max-width:500px; margin:20px auto; padding:20px; border-radius:15px; box-shadow: 0 8px 20px rgba(0,0,0,0.2); }
-  .post-box input, .post-box button { width:100%; padding:12px; margin-top:10px; border-radius:8px; border:1px solid #ddd; box-sizing:border-box; }
-  .post-box button { background: linear-gradient(45deg, #fa7e1e, #d62976); color:white; border:none; font-weight:bold; cursor:pointer; font-size:16px; }
-  .post-box button:hover { opacity:0.9; }
-  .post { background: white; max-width:500px; margin:20px auto; border-radius:15px; overflow:hidden; box-shadow: 0 8px 20px rgba(0,0,0,0.2); }
-  .post img { width: 100%; display:block; }
-  .post-info { padding: 12px 15px; font-weight:500; }
-</style>
+  h2 { text-align:center; color:white; padding:20px; text-shadow: 0 2px 10px rgba(0,0,0,0.3); font-size:28px; margin:0; }
+ .post-box { background: white; max-width:500px; margin:20px auto; padding:20px; border-radius:15px; box-shadow: 0 8px 20px rgba(0,0,0,0.2); }
+ .post-box input,.post-box button { width:100%; padding:12px; margin-top:10px; border-radius:8px; border:1px solid #ddd; box-sizing:border-box; }
+ .post-box button { background: linear-gradient(45deg, #fa7e1e, #d62976); color:white; border:none; font-weight:bold; cursor:pointer; font-size:16px; }
+ .post { background: white; max-width:500px; margin:20px auto; border-radius:15px; overflow:hidden; box-shadow: 0 8px 20px rgba(0,0,0,0.2); }
+ .post img { width: 100%; display:block; }
+ .post-info { padding: 12px 15px; font-weight:500; }
+ .top { text-align:center; color:white; }
+ .top button { background:white; color:#d62976; border:none; padding:6px 12px; border-radius:20px; font-weight:bold; cursor:pointer; }
+  </style>
 </head>
 <body>
   <h2>AdityaGram 📸</h2>
+  <div class="top">
+    <span id="userShow"></span> | <button onclick="logout()">Logout</button>
+  </div>
 
   <div class="post-box">
     <h3>Naya Post</h3>
     <input type="text" id="caption" placeholder="Caption likho...">
-    <input type="file" id="image">
+    <input type="file" id="image" accept="image/*">
     <button onclick="uploadPost()">Post Karo</button>
   </div>
 
-  <div id="feed"></div>
+  <div id="feed">Loading posts...</div>
+
 <script>
+  const BACKEND = "https://adityagram-backend-aditya12-2026.onrender.com";
+
+  // Login check
+  if(!localStorage.getItem('username')){
+    window.location.href = "login.html";
+  }
+  document.getElementById('userShow').innerText = localStorage.getItem('username');
+
+  function logout(){
+    localStorage.clear();
+    window.location.href = "login.html";
+  }
+
   async function loadPosts() {
-    const res = await fetch('/api/posts');
-    const posts = await res.json();
-    document.getElementById('feed').innerHTML = posts.map(p => `
-      <div class="post">
-        <img src="${p.imageUrl}">
-        <div class="post-info">
-          <b>${p.username}</b> - ${p.caption}
-          <br>
-          <button onclick="likePost('${p._id}')">❤️ ${p.likes || 0} Likes</button>
+    try {
+      const res = await fetch(BACKEND + '/posts');
+      const posts = await res.json();
+      document.getElementById('feed').innerHTML = posts.reverse().map(p => `
+        <div class="post">
+          <img src="${p.imageUrl}">
+          <div class="post-info">
+            <b>${p.username}</b> - ${p.caption}
+            <br>
+            <button onclick="likePost('${p._id}')">❤️ ${p.likes || 0} Likes</button>
+          </div>
         </div>
-      </div>
-    `).join('');
+      `).join('') || "<p style='text-align:center;color:white'>No posts yet</p>";
+    } catch(e){
+      document.getElementById('feed').innerHTML = "Failed to load";
+    }
   }
 
   async function uploadPost() {
@@ -54,7 +76,7 @@
     formData.append('image', image);
     formData.append('username', localStorage.getItem('username') || 'aditya');
 
-    const res = await fetch('/api/posts', { method: 'POST', body: formData });
+    const res = await fetch(BACKEND + '/posts', { method: 'POST', body: formData });
     if(res.ok) {
       captionInput.value = '';
       imageInput.value = '';
@@ -66,12 +88,11 @@
   }
 
   async function likePost(id) {
-    await fetch('/api/posts/' + id + '/like', { method: 'POST' });
+    await fetch(BACKEND + '/posts/' + id + '/like', { method: 'POST' });
     loadPosts();
   }
 
   loadPosts();
 </script>
-
 </body>
 </html>

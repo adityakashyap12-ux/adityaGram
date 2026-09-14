@@ -34,27 +34,34 @@ async function signup(){
   const msg = document.getElementById('msg');
 
   if(!email || !password){
+    msg.style.color = "red";
     msg.innerText = "Please fill all fields";
     return;
   }
+  msg.style.color = "blue";
+  msg.innerText = "Creating account...";
 
-  // Call backend route
-  const res = await fetch('https://adityagram-backend-aditya12-2026.onrender.com/signup', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ email, password })
-  });
+  try {
+    const res = await fetch('https://adityagram-backend-aditya12-2026.onrender.com/signup', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, password })
+    });
 
-  const data = await res.json();
-  msg.innerText = data.message;
+    const data = await res.json();
+    msg.innerText = data.message;
 
-  if(data.success){
-    msg.style.color = "green";
-    setTimeout(() => {
-      window.location.href = "login.html";
-    }, 1000);
-  } else {
+    if(data.success){
+      msg.style.color = "green";
+      setTimeout(() => {
+        window.location.href = "login.html";
+      }, 1000);
+    } else {
+      msg.style.color = "red";
+    }
+  } catch(e){
     msg.style.color = "red";
+    msg.innerText = "Server error";
   }
 }
 </script>

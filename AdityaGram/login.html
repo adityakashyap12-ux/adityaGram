@@ -46,22 +46,42 @@ async function login(){
   const email = document.getElementById('email').value;
   const password = document.getElementById('pass').value;
   const msg = document.getElementById('msg');
-
-  const res = await fetch('https://adityagram-backend-aditya12-2026.onrender.com/login', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ email, password })
-  });
-
-  const data = await res.json();
-  msg.innerText = data.message;
-
-  if(data.success){
-    msg.style.color = "green";
-    // Redirect to home page of AdityaGram
-    window.location.href = "AdityaGram/index.html"; 
-  } else {
+  
+  if(!email || !password){
     msg.style.color = "red";
+    msg.innerText = "Email aur password bharo";
+    return;
+  }
+
+  msg.style.color = "blue";
+  msg.innerText = "Logging in...";
+
+  try {
+    const res = await fetch('https://adityagram-backend-aditya12-2026.onrender.com/login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, password })
+    });
+
+    const data = await res.json();
+    msg.innerText = data.message;
+
+    if(data.success){
+      msg.style.color = "green";
+      // username save karo
+      localStorage.setItem('username', email);
+      localStorage.setItem('email', email);
+      
+      // Sahi redirect
+      setTimeout(() => {
+        window.location.href = "index.html"; 
+      }, 500);
+    } else {
+      msg.style.color = "red";
+    }
+  } catch(err){
+    msg.style.color = "red";
+    msg.innerText = "Server error, try again";
   }
 }
 </script>
