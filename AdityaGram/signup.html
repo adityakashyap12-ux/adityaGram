@@ -42,7 +42,7 @@ async function signup(){
   msg.innerText = "Creating account...";
 
   try {
-    const res = await fetch('https://adityagram-backend-aditya12-2026.onrender.com/signup', {
+   const res = await fetch('/signup',{
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ email, password })

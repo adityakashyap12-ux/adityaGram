@@ -57,7 +57,7 @@ async function login(){
   msg.innerText = "Logging in...";
 
   try {
-    const res = await fetch('https://adityagram-backend-aditya12-2026.onrender.com/login', {
+    const res = await fetch('/login', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ email, password })
