@@ -1,4 +1,6 @@
 const express = require('express');
+const { put } = require('@vercel/blob');
+const multer = require('multer');
 const path = require('path');
 const mongoose = require('mongoose');
 require('dotenv').config();
@@ -16,6 +18,19 @@ app.use(express.static(__dirname));
 const MONGO_URI = process.env.MONGO_URI;
 if (MONGO_URI) {
   mongoose.connect(MONGO_URI)
+  // Vercel Blob Upload - isse photo delete nahi hogi
+const upload = multer();
+
+app.post('/api/upload', upload.single('file'), async (req, res) => {
+  try {
+    const blob = await put(req.file.originalname, req.file.buffer, {
+      access: 'public',
+    });
+    res.json({ url: blob.url });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
     .then(() => console.log('✅ MongoDB Connected'))
     .catch(err => console.log('❌ DB Error:', err));
 } else {
