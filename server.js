@@ -9,11 +9,28 @@ const app = express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// --- MongoDB ---
-const MONGO_URI = process.env.MONGO_URI || process.env.MONGODB_URI;
-mongoose.connect(MONGO_URI)
-  .then(() => console.log('✅ MongoDB Connected'))
-  .catch(err => console.log('❌ DB Error:', err));
+// --- MongoDB - Fixed for Vercel ---
+let isConnected = false;
+async function connectDB() {
+  if (isConnected) return;
+  try {
+    const MONGO_URI = process.env.MONGO_URI || process.env.MONGODB_URI;
+    if (!MONGO_URI) {
+      console.log('❌ MONGO_URI missing');
+      return;
+    }
+    await mongoose.connect(MONGO_URI);
+    isConnected = true;
+    console.log('✅ MongoDB Connected');
+  } catch (err) {
+    console.log('❌ DB Error:', err);
+  }
+}
+
+app.use(async (req, res, next) => {
+  await connectDB();
+  next();
+});
 
 // --- Schemas ---
 const User = mongoose.model('User', new mongoose.Schema({
@@ -38,17 +55,26 @@ app.get('/', (req, res) => {
 
 // AUTH
 app.post('/signup', async (req, res) => {
-  const { email, password } = req.body;
-  if(await User.findOne({ email })) return res.json({ success: false, message: 'User already exists' });
-  await User.create({ email, password });
-  res.json({ success: true, message: 'Signup successful' });
+  try {
+    const { email, password } = req.body;
+    if(await User.findOne({ email })) return res.json({ success: false, message: 'User already exists' });
+    await User.create({ email, password });
+    res.json({ success: true, message: 'Signup successful' });
+  } catch(e) {
+    console.log(e);
+    res.status(500).json({ success: false, message: 'Server error: ' + e.message });
+  }
 });
 
 app.post('/login', async (req, res) => {
-  const { email, password } = req.body;
-  const user = await User.findOne({ email, password });
-  if(!user) return res.json({ success: false, message: 'Invalid login' });
-  res.json({ success: true, message: 'Login success' });
+  try {
+    const { email, password } = req.body;
+    const user = await User.findOne({ email, password });
+    if(!user) return res.json({ success: false, message: 'Invalid login' });
+    res.json({ success: true, message: 'Login success' });
+  } catch(e) {
+    res.status(500).json({ success: false, message: e.message });
+  }
 });
 
 // POSTS
